@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
+import java.nio.charset.Charset;
 
 import com.sk89q.bukkit.util.CommandsManagerRegistration;
 import com.sk89q.minecraft.util.commands.*;
@@ -63,6 +64,18 @@ import com.sk89q.worldguard.util.FatalConfigurationLoadingException;
  * @author sk89q
  */
 public class WorldGuardPlugin extends JavaPlugin {
+
+    /**
+     * The name of Minecraft's builtin plugin channel for sending
+     * texture pack URLs to the client.
+     */
+    private static final String TEXTURE_PLUGIN_CHANNEL = "MC|TPack";
+
+    /**
+     * US-ASCII character set for encoding texture pack URLs sent
+     * to the client through the TEXTURE_PLUGIN_CHANNEL.
+     */
+    private static final Charset US_ASCII_CHARSET = Charset.forName("US-ASCII");
 
     /**
      * Manager for commands. This automatically handles nested commands,
@@ -182,6 +195,10 @@ public class WorldGuardPlugin extends JavaPlugin {
                 }
             }
         }
+
+        // Register outgoing "MC|TPack" plugin channel for client texture
+        // pack switching with the help of the "texture-pack" region flag
+        getServer().getMessenger().registerOutgoingPluginChannel(this, TEXTURE_PLUGIN_CHANNEL);
     }
 
     /**
@@ -191,6 +208,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         globalRegionManager.unload();
         configuration.unload();
         this.getServer().getScheduler().cancelTasks(this);
+        getServer().getMessenger().unregisterOutgoingPluginChannel(this, TEXTURE_PLUGIN_CHANNEL);
     }
 
     /**
@@ -847,5 +865,21 @@ public class WorldGuardPlugin extends JavaPlugin {
         }
 
         return message;
+    }
+
+    /**
+     * Switch texture packs on the client.
+     *
+     * Sends a texture pack URL to the client using the builtin "MC|TPack"
+     * plugin channel. The client will then download the texture pack and
+     * automatically switch to it.
+     *
+     * @param player Switch texture pack in this player's client.
+     * @param url URL from which to download the texture pack. Must use
+     * only US-ASCII characters.
+     */
+    public void switchTexturePack(Player player, String url) {
+        byte[] data = (url + "\0" + "16").getBytes(US_ASCII_CHARSET);
+        player.sendPluginMessage(this, TEXTURE_PLUGIN_CHANNEL, data);
     }
 }
