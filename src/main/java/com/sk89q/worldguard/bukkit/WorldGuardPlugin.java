@@ -32,6 +32,10 @@ import java.util.Set;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 import java.nio.charset.Charset;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.net.URLEncoder;
 
 import com.sk89q.bukkit.util.CommandsManagerRegistration;
 import com.sk89q.minecraft.util.commands.*;
@@ -98,6 +102,11 @@ public class WorldGuardPlugin extends JavaPlugin {
      * Used for scheduling flags.
      */
     private FlagStateManager flagStateManager;
+
+    Constructor packet250CustomPayloadCtor;
+    Method getHandleMethod;
+    Method sendPacketMethod;
+    Field netServerHandlerField;
 
     /**
      * Construct objects. Actual loading occurs when the plugin is enabled, so
@@ -195,10 +204,6 @@ public class WorldGuardPlugin extends JavaPlugin {
                 }
             }
         }
-
-        // Register outgoing "MC|TPack" plugin channel for client texture
-        // pack switching with the help of the "texture-pack" region flag
-        getServer().getMessenger().registerOutgoingPluginChannel(this, TEXTURE_PLUGIN_CHANNEL);
     }
 
     /**
@@ -208,7 +213,6 @@ public class WorldGuardPlugin extends JavaPlugin {
         globalRegionManager.unload();
         configuration.unload();
         this.getServer().getScheduler().cancelTasks(this);
-        getServer().getMessenger().unregisterOutgoingPluginChannel(this, TEXTURE_PLUGIN_CHANNEL);
     }
 
     /**
@@ -879,7 +883,32 @@ public class WorldGuardPlugin extends JavaPlugin {
      * only US-ASCII characters.
      */
     public void switchTexturePack(Player player, String url) {
-        byte[] data = (url + "\0" + "16").getBytes(US_ASCII_CHARSET);
-        player.sendPluginMessage(this, TEXTURE_PLUGIN_CHANNEL, data);
+        try {
+            if (getHandleMethod == null) {
+                getHandleMethod = player.getClass().getMethod("getHandle");
+            }
+            Object entityHuman = getHandleMethod.invoke(player);
+
+            if (netServerHandlerField == null) {
+                netServerHandlerField = entityHuman.getClass().getField("netServerHandler");
+            }
+            Object netServerHandler = netServerHandlerField.get(entityHuman);
+
+            if (packet250CustomPayloadCtor == null) {
+                Class packet = Class.forName("net.minecraft.server.Packet250CustomPayload");
+                packet250CustomPayloadCtor = packet.getConstructor(String.class, (new byte[0]).getClass());
+            }
+            byte[] data = (url + "\0" + "16").getBytes(US_ASCII_CHARSET);
+            Object packet = packet250CustomPayloadCtor.newInstance(TEXTURE_PLUGIN_CHANNEL, data);
+
+            if (sendPacketMethod == null) {
+                Class packetClass = Class.forName("net.minecraft.server.Packet");
+                sendPacketMethod = netServerHandler.getClass().getMethod("sendPacket", packetClass);
+            }
+            sendPacketMethod.invoke(netServerHandler, packet);
+        }
+        catch (Exception e) {
+            getLogger().severe("Cannot switch texture packs: " + e);
+        }
     }
 }
