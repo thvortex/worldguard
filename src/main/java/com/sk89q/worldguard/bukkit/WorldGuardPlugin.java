@@ -31,11 +31,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
-import java.nio.charset.Charset;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.net.URLEncoder;
 
 import com.sk89q.bukkit.util.CommandsManagerRegistration;
 import com.sk89q.minecraft.util.commands.*;
@@ -70,18 +65,6 @@ import com.sk89q.worldguard.util.FatalConfigurationLoadingException;
 public class WorldGuardPlugin extends JavaPlugin {
 
     /**
-     * The name of Minecraft's builtin plugin channel for sending
-     * texture pack URLs to the client.
-     */
-    private static final String TEXTURE_PLUGIN_CHANNEL = "MC|TPack";
-
-    /**
-     * US-ASCII character set for encoding texture pack URLs sent
-     * to the client through the TEXTURE_PLUGIN_CHANNEL.
-     */
-    private static final Charset US_ASCII_CHARSET = Charset.forName("US-ASCII");
-
-    /**
      * Manager for commands. This automatically handles nested commands,
      * permissions checking, and a number of other fancy command things.
      * We just set it up and register commands against it.
@@ -102,31 +85,6 @@ public class WorldGuardPlugin extends JavaPlugin {
      * Used for scheduling flags.
      */
     private FlagStateManager flagStateManager;
-
-    /**
-     * Constructor for Packet250CustomPayload used in switchTexturePack() to
-     * create a TEXTURE_PLUGIN_CHANNEL packet.
-     */
-    Constructor packet250CustomPayloadCtor;
-
-    /**
-     * Handle to CraftHumanEntity.getHandle() used in switchTexturePack().
-     * Returns EntityHuman instance for the CraftHumanEntity/CraftPlayer.
-     */
-    Method getHandleMethod;
-
-    /**
-     * Handle to NetServerHandler.sendPacket() used in switchTexturePack().
-     * Sending a raw packet through this method to the TEXTURE_PLUGIN_CHANNEL
-     * is a workaround for http://bukkit.atlassian.net/browse/BUKKIT-2579
-     */
-    Method sendPacketMethod;
-
-    /**
-     * Handle to EntityHuman.netServerHandler field used in switchTexturePack().
-     * The NetServerHandler object is needed to call sendPacket() on it.
-     */
-    Field netServerHandlerField;
 
     /**
      * Construct objects. Actual loading occurs when the plugin is enabled, so
@@ -889,46 +847,5 @@ public class WorldGuardPlugin extends JavaPlugin {
         }
 
         return message;
-    }
-
-    /**
-     * Switch texture packs on the client.
-     *
-     * Sends a texture pack URL to the client using the builtin "MC|TPack"
-     * plugin channel. The client will then download the texture pack and
-     * automatically switch to it.
-     *
-     * @param player Switch texture pack in this player's client.
-     * @param url URL from which to download the texture pack. Must use
-     * only US-ASCII characters.
-     */
-    public void switchTexturePack(Player player, String url) {
-        try {
-            if (getHandleMethod == null) {
-                getHandleMethod = player.getClass().getMethod("getHandle");
-            }
-            Object entityHuman = getHandleMethod.invoke(player);
-
-            if (netServerHandlerField == null) {
-                netServerHandlerField = entityHuman.getClass().getField("netServerHandler");
-            }
-            Object netServerHandler = netServerHandlerField.get(entityHuman);
-
-            if (packet250CustomPayloadCtor == null) {
-                Class packet = Class.forName("net.minecraft.server.Packet250CustomPayload");
-                packet250CustomPayloadCtor = packet.getConstructor(String.class, (new byte[0]).getClass());
-            }
-            byte[] data = (url + "\0" + "16").getBytes(US_ASCII_CHARSET);
-            Object packet = packet250CustomPayloadCtor.newInstance(TEXTURE_PLUGIN_CHANNEL, data);
-
-            if (sendPacketMethod == null) {
-                Class packetClass = Class.forName("net.minecraft.server.Packet");
-                sendPacketMethod = netServerHandler.getClass().getMethod("sendPacket", packetClass);
-            }
-            sendPacketMethod.invoke(netServerHandler, packet);
-        }
-        catch (Exception e) {
-            getLogger().severe("Cannot switch texture packs: " + e);
-        }
     }
 }
