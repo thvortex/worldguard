@@ -304,10 +304,6 @@ public class WorldGuardPlayerListener implements Listener {
             PlayerFlagState state = plugin.getFlagStateManager().getState(player);
             Location loc = player.getLocation();
 
-            RegionManager mgr = plugin.getGlobalRegionManager().get(loc.getWorld());
-            Vector pt = new Vector(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
-            ApplicableRegionSet set = mgr.getApplicableRegions(pt);
-
             state.lastWorld = loc.getWorld();
             state.lastBlockX = loc.getBlockX();
             state.lastBlockY = loc.getBlockY();
