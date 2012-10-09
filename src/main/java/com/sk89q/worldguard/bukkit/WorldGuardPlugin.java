@@ -103,9 +103,29 @@ public class WorldGuardPlugin extends JavaPlugin {
      */
     private FlagStateManager flagStateManager;
 
+    /**
+     * Constructor for Packet250CustomPayload used in switchTexturePack() to
+     * create a TEXTURE_PLUGIN_CHANNEL packet.
+     */
     Constructor packet250CustomPayloadCtor;
+
+    /**
+     * Handle to CraftHumanEntity.getHandle() used in switchTexturePack().
+     * Returns EntityHuman instance for the CraftHumanEntity/CraftPlayer.
+     */
     Method getHandleMethod;
+
+    /**
+     * Handle to NetServerHandler.sendPacket() used in switchTexturePack().
+     * Sending a raw packet through this method to the TEXTURE_PLUGIN_CHANNEL
+     * is a workaround for http://bukkit.atlassian.net/browse/BUKKIT-2579
+     */
     Method sendPacketMethod;
+
+    /**
+     * Handle to EntityHuman.netServerHandler field used in switchTexturePack().
+     * The NetServerHandler object is needed to call sendPacket() on it.
+     */
     Field netServerHandlerField;
 
     /**
