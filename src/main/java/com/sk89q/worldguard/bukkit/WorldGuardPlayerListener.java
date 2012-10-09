@@ -308,19 +308,10 @@ public class WorldGuardPlayerListener implements Listener {
             Vector pt = new Vector(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
             ApplicableRegionSet set = mgr.getApplicableRegions(pt);
 
-            // If the "texture-pack" flag is set for the region in which the player has
-            // joined the server, then immediately send a texture pack switch request
-            // to the client.
-            String texture = set.getFlag(DefaultFlag.TEXTURE_PACK);
-            if(texture != null) {
-                plugin.switchTexturePack(player, texture);
-            }
-
             state.lastWorld = loc.getWorld();
             state.lastBlockX = loc.getBlockX();
             state.lastBlockY = loc.getBlockY();
             state.lastBlockZ = loc.getBlockZ();
-            state.lastTexture = texture;
         }
     }
 
