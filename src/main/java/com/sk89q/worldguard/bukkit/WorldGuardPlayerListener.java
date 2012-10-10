@@ -303,7 +303,6 @@ public class WorldGuardPlayerListener implements Listener {
         if (wcfg.useRegions) {
             PlayerFlagState state = plugin.getFlagStateManager().getState(player);
             Location loc = player.getLocation();
-
             state.lastWorld = loc.getWorld();
             state.lastBlockX = loc.getBlockX();
             state.lastBlockY = loc.getBlockY();
