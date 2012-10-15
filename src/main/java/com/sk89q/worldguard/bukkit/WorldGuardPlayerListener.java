@@ -185,7 +185,7 @@ public class WorldGuardPlayerListener implements Listener {
 
                     if (texture != null && (state.lastTexture == null
                             || !state.lastTexture.equals(texture))) {
-                            player.switchTexturePack(texture);
+                            plugin.switchTexturePack(player, texture);
                     }
 
                     if ((notifyLeave == null || !notifyLeave)
