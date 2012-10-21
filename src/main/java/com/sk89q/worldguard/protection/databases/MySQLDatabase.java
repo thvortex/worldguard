@@ -184,12 +184,9 @@ public class MySQLDatabase extends AbstractProtectionDatabase {
                         );
             }
 
-            // @TODO: Make this better
-            for (Flag<?> flag : DefaultFlag.getFlags()) {
-                Object o = regionFlags.get(flag.getName());
-                if (o != null) {
-                    setFlag(region, flag, o);
-                }
+            for (Map.Entry<String, Object> entry : regionFlags.entrySet()) {
+                Flag<?> flag = DefaultFlag.getFlag(entry.getKey());
+                setFlag(region, flag, entry.getValue());
             }
         } catch (SQLException ex) {
             logger.warning(

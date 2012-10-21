@@ -54,6 +54,8 @@ import com.sk89q.worldguard.bukkit.commands.GeneralCommands;
 import com.sk89q.worldguard.bukkit.commands.ProtectionCommands;
 import com.sk89q.worldguard.bukkit.commands.ToggleCommands;
 import com.sk89q.worldguard.protection.GlobalRegionManager;
+import com.sk89q.worldguard.protection.flags.CustomFlag;
+import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.util.FatalConfigurationLoadingException;
 
@@ -847,5 +849,9 @@ public class WorldGuardPlugin extends JavaPlugin {
         }
 
         return message;
+    }
+
+    public void addCustomFlag(CustomFlag flag, Plugin plugin) {
+        DefaultFlag.addFlag(flag);
     }
 }

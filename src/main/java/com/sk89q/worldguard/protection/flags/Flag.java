@@ -58,4 +58,18 @@ public abstract class Flag<T> {
     public abstract T unmarshal(Object o);
 
     public abstract Object marshal(T o);
+
+    @Override
+    public final boolean equals(Object o) {
+        if (o instanceof Flag<?>) {
+            return ((Flag<?>)o).name.equals(this.name);
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public final int hashCode() {
+        return name.hashCode();
+    }
 }

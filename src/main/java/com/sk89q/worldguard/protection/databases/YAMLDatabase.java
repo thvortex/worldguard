@@ -158,20 +158,10 @@ public class YAMLDatabase extends AbstractProtectionDatabase {
         if (flagsData == null) {
             return;
         }
-        
-        // @TODO: Make this better
-        for (Flag<?> flag : DefaultFlag.getFlags()) {
-            Object o = flagsData.getProperty(flag.getName());
-            if (o != null) {
-                setFlag(region, flag, o);
-            }
-            
-            if (flag.getRegionGroupFlag() != null) {
-            Object o2 = flagsData.getProperty(flag.getRegionGroupFlag().getName());
-                if (o2 != null) {
-                    setFlag(region, flag.getRegionGroupFlag(), o2);
-                }
-            }
+
+        for (Map.Entry<String, Object> entry : flagsData.getMap().entrySet()) {
+            Flag<?> flag = DefaultFlag.getFlag(entry.getKey());
+            setFlag(region, flag, entry.getValue());
         }
     }
     

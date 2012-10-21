@@ -34,9 +34,9 @@ public class ApplicableRegionSetTest {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
         ProtectedRegion region;
 
-        StateFlag STATE1 = new StateFlag(null, false);
-        StateFlag STATE2 = new StateFlag(null, false);
-        StateFlag STATE3 = new StateFlag(null, false);
+        StateFlag STATE1 = new StateFlag("STATE1", false);
+        StateFlag STATE2 = new StateFlag("STATE2", false);
+        StateFlag STATE3 = new StateFlag("STATE3", false);
 
         region = mock.add(0);
         region.setFlag(STATE1, StateFlag.State.ALLOW);
@@ -57,10 +57,10 @@ public class ApplicableRegionSetTest {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
         ProtectedRegion region;
 
-        StringFlag STRING1 = new StringFlag(null);
-        StringFlag STRING2 = new StringFlag(null);
-        StringFlag STRING3 = new StringFlag(null);
-        StringFlag STRING4 = new StringFlag(null);
+        StringFlag STRING1 = new StringFlag("STRING1");
+        StringFlag STRING2 = new StringFlag("STRING2");
+        StringFlag STRING3 = new StringFlag("STRING3");
+        StringFlag STRING4 = new StringFlag("STRING4");
 
         region = mock.add(0);
         region.setFlag(STRING1, "Beans");
@@ -82,10 +82,10 @@ public class ApplicableRegionSetTest {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
         ProtectedRegion region;
 
-        StringFlag STRING1 = new StringFlag(null);
-        StringFlag STRING2 = new StringFlag(null);
-        StringFlag STRING3 = new StringFlag(null);
-        StringFlag STRING4 = new StringFlag(null);
+        StringFlag STRING1 = new StringFlag("STRING1");
+        StringFlag STRING2 = new StringFlag("STRING2");
+        StringFlag STRING3 = new StringFlag("STRING3");
+        StringFlag STRING4 = new StringFlag("STRING4");
 
         region = mock.add(0);
         region.setFlag(STRING1, "Beans");
@@ -111,12 +111,12 @@ public class ApplicableRegionSetTest {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
         ProtectedRegion region;
 
-        StateFlag STATE1 = new StateFlag(null, false);
-        StateFlag STATE2 = new StateFlag(null, false);
-        StateFlag STATE3 = new StateFlag(null, false);
-        StateFlag STATE4 = new StateFlag(null, true);
-        StateFlag STATE5 = new StateFlag(null, true);
-        StateFlag STATE6 = new StateFlag(null, true);
+        StateFlag STATE1 = new StateFlag("STATE1", false);
+        StateFlag STATE2 = new StateFlag("STATE2", false);
+        StateFlag STATE3 = new StateFlag("STATE3", false);
+        StateFlag STATE4 = new StateFlag("STATE4", true);
+        StateFlag STATE5 = new StateFlag("STATE5", true);
+        StateFlag STATE6 = new StateFlag("STATE6", true);
 
         region = mock.global();
         region.setFlag(STATE1, StateFlag.State.ALLOW);
@@ -138,12 +138,12 @@ public class ApplicableRegionSetTest {
         MockApplicableRegionSet mock = new MockApplicableRegionSet();
         ProtectedRegion region;
 
-        StateFlag STATE1 = new StateFlag(null, false);
-        StateFlag STATE2 = new StateFlag(null, false);
-        StateFlag STATE3 = new StateFlag(null, false);
-        StateFlag STATE4 = new StateFlag(null, true);
-        StateFlag STATE5 = new StateFlag(null, true);
-        StateFlag STATE6 = new StateFlag(null, true);
+        StateFlag STATE1 = new StateFlag("STATE1", false);
+        StateFlag STATE2 = new StateFlag("STATE2", false);
+        StateFlag STATE3 = new StateFlag("STATE3", false);
+        StateFlag STATE4 = new StateFlag("STATE4", true);
+        StateFlag STATE5 = new StateFlag("STATE5", true);
+        StateFlag STATE6 = new StateFlag("STATE6", true);
 
         region = mock.global();
         region.setFlag(STATE1, StateFlag.State.ALLOW);

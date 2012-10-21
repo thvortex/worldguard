@@ -19,6 +19,10 @@
 
 package com.sk89q.worldguard.protection.flags;
 
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import org.bukkit.GameMode;
 import org.bukkit.entity.EntityType;
 
@@ -88,7 +92,7 @@ public final class DefaultFlag {
     public static final SetFlag<String> BLOCKED_CMDS = new SetFlag<String>("blocked-cmds", RegionGroup.ALL, new CommandStringFlag(null));
     public static final SetFlag<String> ALLOWED_CMDS = new SetFlag<String>("allowed-cmds", RegionGroup.ALL, new CommandStringFlag(null));
 
-    public static final Flag<?>[] flagsList = new Flag<?>[] {
+    private static final Flag<?>[] flagsList = new Flag<?>[] {
         PASSTHROUGH, BUILD, CONSTRUCT, PVP, CHEST_ACCESS, PISTONS,
         TNT, LIGHTER, USE, PLACE_VEHICLE, DESTROY_VEHICLE, SLEEP,
         MOB_DAMAGE, MOB_SPAWNING, DENY_SPAWN, INVINCIBILITY, EXP_DROPS,
@@ -104,11 +108,42 @@ public final class DefaultFlag {
         BLOCKED_CMDS, ALLOWED_CMDS, PRICE, BUYABLE,
     };
 
+    private static final Map<String, Flag<?>> flagMap = new LinkedHashMap<String, Flag<?>>();
+
+    static {
+        for (Flag<?> flag : flagsList) {
+            addFlag(flag);
+        }
+    }
 
     private DefaultFlag() {
     }
 
-    public static Flag<?>[] getFlags() {
-        return flagsList;
+    public static Collection<Flag<?>> getFlags() {
+        return flagMap.values();
+    }
+
+    public static void addFlag(Flag<?> flag) {
+        if (flag.getName().endsWith("-group")) {
+            throw new IllegalArgumentException("Cannot register flag name ending with '-group'");
+        }
+
+        flagMap.put(flag.getName(), flag);
+    }
+
+    public static Flag<?> getFlag(String flagName) {
+        String baseFlagName = flagName.replaceFirst("-group$", "");
+        Flag<?> flag = flagMap.get(baseFlagName);
+
+        if (flag == null) {
+            flag = new CustomFlag(baseFlagName);
+            flagMap.put(baseFlagName, flag);
+        }
+
+        if (!baseFlagName.equals(flagName)) {
+            flag = flag.getRegionGroupFlag();
+        }
+
+        return flag;
     }
 }
