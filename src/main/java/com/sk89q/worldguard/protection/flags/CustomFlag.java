@@ -19,6 +19,7 @@
 package com.sk89q.worldguard.protection.flags;
 
 import org.bukkit.command.CommandSender;
+import org.bukkit.plugin.Plugin;
 
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 
@@ -28,12 +29,30 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
  */
 public class CustomFlag extends Flag<Object> {
 
-    public CustomFlag(String name, RegionGroup defaultGroup) {
-        super(name, defaultGroup);
+    private String displayName;
+
+    public CustomFlag(String name, Plugin plugin, RegionGroup defaultGroup) {
+        super(plugin.getName() + "-" + name, defaultGroup);
+        this.displayName = name;
     }
 
-    public CustomFlag(String name) {
+    public CustomFlag(String name, Plugin plugin) {
+        super(plugin.getName() + "-" + name);
+        this.displayName = name;
+    }
+
+    CustomFlag(String name) {
         super(name);
+        this.displayName = name;
+    }
+
+    void setFullDisplayName() {
+        this.displayName = getName();
+    }
+
+    @Override
+    public String getDisplayName() {
+        return displayName;
     }
 
     @Override

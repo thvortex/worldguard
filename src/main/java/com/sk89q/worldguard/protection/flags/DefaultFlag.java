@@ -20,6 +20,7 @@
 package com.sk89q.worldguard.protection.flags;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -92,7 +93,7 @@ public final class DefaultFlag {
     public static final SetFlag<String> BLOCKED_CMDS = new SetFlag<String>("blocked-cmds", RegionGroup.ALL, new CommandStringFlag(null));
     public static final SetFlag<String> ALLOWED_CMDS = new SetFlag<String>("allowed-cmds", RegionGroup.ALL, new CommandStringFlag(null));
 
-    private static final Flag<?>[] flagsList = new Flag<?>[] {
+    private static final Flag<?>[] defaultFlags = new Flag<?>[] {
         PASSTHROUGH, BUILD, CONSTRUCT, PVP, CHEST_ACCESS, PISTONS,
         TNT, LIGHTER, USE, PLACE_VEHICLE, DESTROY_VEHICLE, SLEEP,
         MOB_DAMAGE, MOB_SPAWNING, DENY_SPAWN, INVINCIBILITY, EXP_DROPS,
@@ -109,10 +110,11 @@ public final class DefaultFlag {
     };
 
     private static final Map<String, Flag<?>> flagMap = new LinkedHashMap<String, Flag<?>>();
+    private static final Map<String, Flag<?>> displayNameMap = new HashMap<String, Flag<?>>();
 
     static {
-        for (Flag<?> flag : flagsList) {
-            addFlag(flag);
+        for (Flag<?> flag : defaultFlags) {
+            flagMap.put(flag.getName(), flag);
         }
     }
 
@@ -123,18 +125,31 @@ public final class DefaultFlag {
         return flagMap.values();
     }
 
-    public static void addFlag(Flag<?> flag) {
-        if (flag.getName().endsWith("-group")) {
-            throw new IllegalArgumentException("Cannot register flag name ending with '-group'");
+    public static void addFlag(CustomFlag newFlag) {
+        if (newFlag.getName().endsWith("-group")) {
+            throw new IllegalArgumentException("Cannot register flag name ending with '-group': " + newFlag.getName());
         }
 
-        flagMap.put(flag.getName(), flag);
+        // Duplicate flag names force flags to start using their fully qualified names for display
+        Flag<?> oldFlag = displayNameMap.get(newFlag.getDisplayName());
+        if (oldFlag != null) {
+            // Only custom plugin flags change display names; builtin WorldGuard flags never do
+            if (oldFlag instanceof CustomFlag) {
+                ((CustomFlag)oldFlag).setFullDisplayName();
+            }
+            newFlag.setFullDisplayName();
+            // displayNameMap still has the short display name for oldFlag so new duplicate flag names keep matching it
+        }
+
+        flagMap.put(newFlag.getName(), newFlag);
+        displayNameMap.put(newFlag.getDisplayName(), newFlag);
     }
 
     public static Flag<?> getFlag(String flagName) {
         String baseFlagName = flagName.replaceFirst("-group$", "");
         Flag<?> flag = flagMap.get(baseFlagName);
 
+        // A missing name is a custom flag read from region database before a plugin can register it
         if (flag == null) {
             flag = new CustomFlag(baseFlagName);
             flagMap.put(baseFlagName, flag);

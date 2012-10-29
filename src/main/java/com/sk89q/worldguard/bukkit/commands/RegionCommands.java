@@ -507,9 +507,9 @@ public class RegionCommands {
             }
 
             if(group == null) {
-                s.append(flag.getName() + ": " + String.valueOf(val));
+                s.append(flag.getDisplayName() + ": " + String.valueOf(val));
             } else {
-                s.append(flag.getName() + " -g " + String.valueOf(group) + ": " + String.valueOf(val));
+                s.append(flag.getDisplayName() + " -g " + String.valueOf(group) + ": " + String.valueOf(val));
             }
 
             hasFlags = true;
@@ -710,7 +710,7 @@ public class RegionCommands {
         // Now time to find the flag!
         for (Flag<?> flag : DefaultFlag.getFlags()) {
             // Try to detect the flag
-            if (flag.getName().replace("-", "").equalsIgnoreCase(flagName.replace("-", ""))) {
+            if (flag.getDisplayName().replace("-", "").equalsIgnoreCase(flagName.replace("-", ""))) {
                 foundFlag = flag;
                 break;
             }
@@ -745,7 +745,7 @@ public class RegionCommands {
                     }
                 } 
                 
-                list.append(flag.getName());
+                list.append(flag.getDisplayName());
             }
 
             player.sendMessage(ChatColor.RED + "Unknown flag specified: " + flagName);
@@ -768,7 +768,7 @@ public class RegionCommands {
             String group = args.getFlag('g');
             RegionGroupFlag groupFlag = foundFlag.getRegionGroupFlag();
             if (groupFlag == null) {
-                throw new CommandException("Region flag '" + foundFlag.getName()
+                throw new CommandException("Region flag '" + foundFlag.getDisplayName()
                         + "' does not have a group flag!");
             }
 
@@ -791,7 +791,7 @@ public class RegionCommands {
             }
 
             sender.sendMessage(ChatColor.YELLOW
-                    + "Region flag '" + foundFlag.getName() + "' set.");
+                    + "Region flag '" + foundFlag.getDisplayName() + "' set.");
         }
 
         if (value == null && !args.hasFlag('g')) {
@@ -805,7 +805,7 @@ public class RegionCommands {
             }
 
             sender.sendMessage(ChatColor.YELLOW
-                    + "Region flag '" + foundFlag.getName() + "' cleared.");
+                    + "Region flag '" + foundFlag.getDisplayName() + "' cleared.");
         }
 
         if (groupValue != null) {
@@ -815,11 +815,11 @@ public class RegionCommands {
             if (groupValue == groupFlag.getDefault()) {
                 region.setFlag(groupFlag, null);
                 sender.sendMessage(ChatColor.YELLOW
-                        + "Region group flag for '" + foundFlag.getName() + "' reset to default.");
+                        + "Region group flag for '" + foundFlag.getDisplayName() + "' reset to default.");
             } else {
                 region.setFlag(groupFlag, groupValue);
                 sender.sendMessage(ChatColor.YELLOW
-                        + "Region group flag for '" + foundFlag.getName() + "' set.");
+                        + "Region group flag for '" + foundFlag.getDisplayName() + "' set.");
             }
         }
 

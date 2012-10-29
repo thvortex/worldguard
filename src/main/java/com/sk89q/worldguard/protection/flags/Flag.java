@@ -47,7 +47,11 @@ public abstract class Flag<T> {
     public String getName() {
         return name;
     }
-    
+
+    public String getDisplayName() {
+        return name;
+    }
+
     public RegionGroupFlag getRegionGroupFlag() {
         return regionGroup;
     }
