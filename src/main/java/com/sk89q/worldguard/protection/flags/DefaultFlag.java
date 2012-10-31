@@ -115,6 +115,7 @@ public final class DefaultFlag {
     static {
         for (Flag<?> flag : defaultFlags) {
             flagMap.put(flag.getName(), flag);
+            displayNameMap.put(flag.getDisplayName(), flag);
         }
     }
 
